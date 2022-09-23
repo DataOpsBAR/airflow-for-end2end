@@ -1,0 +1,56 @@
+---
+- hosts: localhost
+  connection: local
+
+  tasks:
+
+  - name: Install Docker
+    ansible.builtin.shell: cd ~ && curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh && rm -f get-docker.sh
+    
+  - name: Create a Directory Airflow
+    file:
+      path: /root/airflow
+      state: directory
+
+  - name: Copy .env file to airflow path
+    ansible.builtin.copy:
+      src: ./.env
+      dest: /root/airflow
+      owner: root
+      group: root
+      mode: '0644'
+
+  - name: Create a Directory dags
+    file:
+      path: /root/airflow/dags
+      state: directory
+
+  - name: Create a Directory logs
+    file:
+      path: /root/airflow/logs
+      state: directory
+
+  - name: Create a Directory plugins
+    file:
+      path: /root/airflow/plugins
+      state: directory
+
+  - name: Copy docker-compose file to airflow path
+    ansible.builtin.copy:
+      src: ./docker-compose.yaml
+      dest: /root/airflow
+      owner: root
+      group: root
+      mode: '0644'
+
+  - name: Initialize the Airflow database
+    ansible.builtin.shell: cd /root/airflow && docker compose -p airflow up airflow-init
+
+  - name: Running Airflow
+    ansible.builtin.shell: cd /root/airflow && docker compose -p airflow up -d
+
+
+
+
+    
+   
